@@ -1,0 +1,84 @@
+## install
+sudo apt-add-repository ppa:ansible/ansible
+sudo apt update
+sudo apt install ansible
+
+python3 --version
+ansible --version
+
+## create keys
+ssh-keygen -t rsa -b 4096
+## change name key or not) "name"
+
+# copy public text of key name.pub in to file, add add line "/home/ubuntu/.ssh/authorized_keys" to each server
+# or use command
+ssh-copy-id -i ~/.ssh/id_rsa.pub user_you_server@server_ip 
+# enter password and key install by install and added into ~/.ssh/authorized_keys on remoute server
+
+# inventory
+sudo nano /etc/ansible/hosts
+   
+    [servers]
+    serv1 ansible_host=172.31.34.23 ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa
+    serv2 ansible_host=172.31.44.108 ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa
+    serv3 ansible_host=172.31.42.89 ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa
+    serv4 ansible_host=172.31.42.130 ansible_ssh_private_key_file=/home/ubuntu/.ssh/id_rsa
+
+    [all:vars]
+    ansible_python_interpreter=/usr/bin/python3
+
+# inventory
+ansible-inventory --list -y
+
+all:
+  children:
+    servers:
+      hosts:
+        serv1:
+          ansible_host: 172.31.34.23
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_ssh_private_key_file: /home/ubuntu/.ssh/id_rsa
+          ansible_user: ubuntu
+        serv2:
+          ansible_host: 172.31.44.108
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_ssh_private_key_file: /home/ubuntu/.ssh/id_rsa
+          ansible_user: ubuntu
+        serv3:
+          ansible_host: 172.31.42.89
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_ssh_private_key_file: /home/ubuntu/.ssh/id_rsa
+          ansible_user: ubuntu
+        serv4:
+          ansible_host: 172.31.42.130
+          ansible_python_interpreter: /usr/bin/python3
+          ansible_ssh_private_key_file: /home/ubuntu/.ssh/id_rsa
+          ansible_user: ubuntu
+    ungrouped: {}
+
+ansible all -m ping
+
+serv1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+serv2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+serv3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+serv4 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+# uname -a on from remote server
+ansible -m shell -a 'uname -a' serv4                  
+
+serv4 | CHANGED | rc=0 >>
+Linux ip-172-31-42-130 5.19.0-1028-aws #29~22.04.1-Ubuntu SMP Tue Jun 20 19:12:11 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
